@@ -1,5 +1,4 @@
 // noinspection ES6ConvertRequireIntoImport
-import fs from 'fs';
 const path = require('path');
 const shell = require('shelljs');
 
