@@ -2,7 +2,7 @@
 const path = require('path');
 const shell = require('shelljs');
 
-const placeholderRegex = /"\s*exec\s*"\s*:\s*"{{{\s*file:\/\/\/\s*([^}]+)\s*}}}"\s*/g;
+const placeholderRegex = /\s*"{{{\s*file:\/\/\/\s*([^}]+)\s*}}}"\s*/g;
 export function transformCollection(args: { _: any[]; }) {
     const templateFilePath = args?._[1];
     const resolvedTemplateFilePath = path.resolve(templateFilePath);
@@ -23,7 +23,7 @@ function transformTemplate(templateContent: string, templateFilePath: string): s
             const resolvedPath = path.resolve(absolutePath);
             const scriptContent = shell.cat(resolvedPath)
                 .toString();
-            templateContent = templateContent.replace(placeholder, `"exec": ${JSON.stringify(scriptContent)}`);
+            templateContent = templateContent.replace(placeholder, ` ${JSON.stringify(scriptContent)}`);
         } catch (error) {
             console.error(`Failed to read file: ${filePath}`);
         }
