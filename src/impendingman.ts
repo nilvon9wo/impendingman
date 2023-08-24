@@ -4,7 +4,7 @@ const shell = require('shelljs');
 import {ShellString} from "shelljs";
 import {transformCollection} from './transformTemplate';
 
-const customOutputFlag = 'impendingman-o';
+const customOutputFlag = 'impending-man-o';
 
 const args = minimist(process.argv.slice(2));
 const transformedContent = transformCollection(args);
@@ -15,12 +15,12 @@ const result = shell.exec(newmanCommand);
 cleanUp(outputFilePath, transformedFilePath);
 exit(result);
 
+// noinspection JSUnresolvedReference
 function writeTransformedCollection(args: (string | any)[]) {
-    // @ts-ignore
-    const outputFilePath = args[customOutputFlag];
+    const outputFilePath = args[customOutputFlag as keyof typeof args];
     const transformedFilePath = outputFilePath ?? `./dist/transformed-collection.json`;
     shell.ShellString(transformedContent)
-        .to(transformedFilePath);
+            .to(transformedFilePath);
     return {outputFilePath, transformedFilePath};
 }
 
