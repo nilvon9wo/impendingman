@@ -13,7 +13,7 @@ shell.ShellString(transformedContent)
 const newmanArgsAfterTemplate = process.argv.slice(3).join(' ');
 const newmanCommand = `newman run ${transformedFilePath} ${newmanArgsAfterTemplate}`;
 const result = shell.exec(newmanCommand);
-//RESTORE: shell.rm(transformedFilePath);
+shell.rm(transformedFilePath);
 
 if (result.code !== 0) {
     console.error('Newman execution failed');
