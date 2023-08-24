@@ -3,3 +3,4 @@
 /run.sh
 /etc/
 /dist/
+/*.log
