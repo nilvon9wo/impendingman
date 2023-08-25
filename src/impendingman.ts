@@ -4,7 +4,7 @@ const shell = require('shelljs');
 import {ShellString} from "shelljs";
 import {transformCollection} from './transformTemplate';
 
-const customOutputFlag = 'impending-man-o';
+const customOutputFlag = 'impending-man-output';
 
 const args = minimist(process.argv.slice(2));
 const transformedContent = transformCollection(args);
@@ -17,16 +17,28 @@ exit(result);
 
 // noinspection JSUnresolvedReference
 function writeTransformedCollection(args: (string | any)[]) {
-    const outputFilePath = args[customOutputFlag as keyof typeof args];
-    const transformedFilePath = outputFilePath ?? `./dist/transformed-collection.json`;
+    const {outputFilePath, transformedFilePath} = selectOutputPath(args);
     shell.ShellString(transformedContent)
-            .to(transformedFilePath);
+        .to(transformedFilePath);
     return {outputFilePath, transformedFilePath};
+}
+
+function selectOutputPath(args: any[]) {
+    const outputFilePath = args[customOutputFlag as keyof typeof args];
+    const transformedFilePath = outputFilePath ?? createTimestampedPath();
+    return {outputFilePath, transformedFilePath};
+}
+
+function createTimestampedPath() {
+    const timestamp = new Date()
+        .toISOString()
+        .replace(/[-:.]/g, '');
+    return `./transformed-collection_${timestamp}.json`;
 }
 
 function extractNewmanArguments() {
     return process.argv.slice(3)
-        .filter(arg => arg !== customOutputFlag)
+        .filter(arg => arg !== `--${customOutputFlag}`)
         .join(' ');
 }
 
@@ -44,5 +56,3 @@ function exit(result: ShellString) {
     }
     process.exit(result.code);
 }
-
-
