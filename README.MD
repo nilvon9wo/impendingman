@@ -4,8 +4,8 @@ Impendingman is a wrapper for Newman’s Postman collection runner.
 
 ## The Problem
 
-1. Postman is a great tool for testing APIs, but it's not ideal for editing JavaScript.
-2. Newman is excellent for running Postman tests from the command line, but it doesn't accept JavaScript files directly.
+1. [Postman](https://www.postman.com/) is a great tool for testing APIs, but it's not ideal for editing JavaScript.
+2. [Newman](https://github.com/postmanlabs/newman) is excellent for running Postman tests from the command line, but it doesn't accept JavaScript files directly.
 
 To better facilitate the development of JavaScript tests for API end-to-end testing, Impendingman accepts template JSON files. It searches for file references and, when the files exist, safely embeds their contents within the JSON file. This enables Newman to execute JavaScript tests seamlessly.
 
