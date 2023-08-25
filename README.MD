@@ -43,6 +43,9 @@ Impendingman has two modes of operation:
 
 * Run: Execute tests immediately.
 * Populate: Populate the template without execution.
+
+### Run
+> **Warning:**  Run mode presently requires "newman" to be installed to the host as it is _not_ included within this solution (yet).
 To run immediately, execute Impendingman as follows:
 
 ```shell
@@ -51,8 +54,9 @@ node impendingman.js run "./path/to/collection.template.json" -g "./path/to/glob
   --impending-man-output "./collection.populated.json"
 ```
 
-
 The --impending-man-output option is optional. If omitted, a random name is used, and the file is automatically deleted upon completion.
+
+### Populate
 
 To populate the template for later use without running:
 
