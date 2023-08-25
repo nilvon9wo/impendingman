@@ -36,7 +36,7 @@ For instance, consider a template JSON collection:
 }
 ```
 
-In this example, Impendingman will search for file references like {{{file:///./Example_collection/step1_test_confirm_something.js}}}. If the file path is valid, it replaces the reference with the JavaScript content, allowing Newman to execute the collection.
+In this example, Impendingman will search for file references like `{{{file:///./Example_collection/step1_test_confirm_something.js}}}`. If the file path is valid, it replaces the reference with the JavaScript content, allowing Newman to execute the collection.
 
 ## Modes of Operation
 Impendingman has two modes of operation:
@@ -54,7 +54,7 @@ node impendingman.js run "./path/to/collection.template.json" -g "./path/to/glob
   --impending-man-output "./collection.populated.json"
 ```
 
-The --impending-man-output option is optional. If omitted, a random name is used, and the file is automatically deleted upon completion.
+The `--impending-man-output` option is optional. If omitted, a random name is used, and the file is automatically deleted upon completion.
 
 ### Populate
 
