@@ -1,58 +1,7 @@
 // noinspection ES6ConvertRequireIntoImport
 const minimist = require('minimist');
-const shell = require('shelljs');
-import {ShellString} from "shelljs";
-import {transformCollection} from './transformTemplate';
-
-const customOutputFlag = 'impending-man-output';
+import  {run} from './runner';
 
 const args = minimist(process.argv.slice(2));
-const transformedContent = transformCollection(args);
-const {outputFilePath, transformedFilePath} = writeTransformedCollection(args);
-const newmanArgsAfterTemplate = extractNewmanArguments();
-const newmanCommand = `newman run ${transformedFilePath} ${newmanArgsAfterTemplate}`;
-const result = shell.exec(newmanCommand);
-cleanUp(outputFilePath, transformedFilePath);
-exit(result);
+run(args);
 
-// noinspection JSUnresolvedReference
-function writeTransformedCollection(args: (string | any)[]) {
-    const {outputFilePath, transformedFilePath} = selectOutputPath(args);
-    shell.ShellString(transformedContent)
-        .to(transformedFilePath);
-    return {outputFilePath, transformedFilePath};
-}
-
-function selectOutputPath(args: any[]) {
-    const outputFilePath = args[customOutputFlag as keyof typeof args];
-    const transformedFilePath = outputFilePath ?? createTimestampedPath();
-    return {outputFilePath, transformedFilePath};
-}
-
-function createTimestampedPath() {
-    const timestamp = new Date()
-        .toISOString()
-        .replace(/[-:.]/g, '');
-    return `./transformed-collection_${timestamp}.json`;
-}
-
-function extractNewmanArguments() {
-    return process.argv.slice(3)
-        .filter(arg => arg !== `--${customOutputFlag}`)
-        .join(' ');
-}
-
-function cleanUp(outputFilePath: string, transformedFilePath: string) {
-    if (!outputFilePath) {
-        shell.rm(transformedFilePath);
-    }
-}
-
-function exit(result: ShellString) {
-    if (result.code !== 0) {
-        console.error('Newman execution failed.');
-    } else {
-        console.log('Newman executed successfully.');
-    }
-    process.exit(result.code);
-}
