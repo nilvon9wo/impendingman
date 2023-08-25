@@ -1,12 +1,12 @@
 import {transformCollection} from "./transformTemplate";
 // @ts-ignore
 const shell = require('shelljs');
-import {ShellString} from "shelljs";
+import {ShellString} from 'shelljs';
 
 const customOutputFlag = 'impending-man-output';
 export function run(args: { _: any[]; }) {
     const transformedContent = transformCollection(args);
-    const {outputFilePath, transformedFilePath} = writeTransformedCollection(transformedContent, args._);
+    const {outputFilePath, transformedFilePath} = writeTransformedCollection(transformedContent, args);
     const newmanArgsAfterTemplate = extractNewmanArguments();
     const newmanCommand = `newman run ${transformedFilePath} ${newmanArgsAfterTemplate}`;
     const result = shell.exec(newmanCommand);
@@ -17,17 +17,17 @@ export function run(args: { _: any[]; }) {
 
 
 // noinspection JSUnresolvedReference
-function writeTransformedCollection(transformedContent: string, args: (string | any)[]) {
+function writeTransformedCollection(transformedContent: string, args: { _: any[]; }) {
     const {outputFilePath, transformedFilePath} = selectOutputPath(args);
     shell.ShellString(transformedContent)
         .to(transformedFilePath);
     return {outputFilePath, transformedFilePath};
 }
 
-function selectOutputPath(args: any[]) {
+function selectOutputPath(args: { _: any[]; [key: string]: any }) {
     const outputFilePath = args[customOutputFlag as keyof typeof args];
     const transformedFilePath = outputFilePath ?? createTimestampedPath();
-    return {outputFilePath, transformedFilePath};
+    return { outputFilePath, transformedFilePath };
 }
 
 function createTimestampedPath() {

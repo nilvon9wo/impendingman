@@ -1,0 +1,208 @@
+{
+	"info": {
+		"_postman_id": "b1e54ecc-9b93-49b4-aaf9-1c052baecabe",
+		"name": "WorkDay2AirTable",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12364657"
+	},
+	"item": [
+		{
+			"name": "Workday Employee Event Generator Dev Auth Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": "const response = pm.response.json();\r\npm.globals.set('jwt_for_workday_to_airtable', response.access_token);\r\npm.test('Status code is 200', () =>\r\n    pm.response.to.have.status(200)\r\n);\r\n",
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "scope",
+							"value": "{{AZURE_AD_CLIENT_SCOPE}}",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{AZURE_AD_CLIENT_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{AZURE_AD_CLIENT_SECRET}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://login.microsoftonline.com/{{AZURE_AD_TENANT_ID}}/oauth2/v2.0/token",
+					"protocol": "https",
+					"host": [
+						"login",
+						"microsoftonline",
+						"com"
+					],
+					"path": [
+						"{{AZURE_AD_TENANT_ID}}",
+						"oauth2",
+						"v2.0",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://{{ENPAL_TRANSCRIBER_SUBDOMAIN}}.azurewebsites.net/api/EmployeeEventReceiver",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": "const randomId = 'TEST-' + Math.floor(Math.random() * 10000000000);\r\npm.globals.set('RANDOM_ID', randomId.toString());\r\nconst randomFirstName = 'First' + Math.floor(Math.random() * 100000);\r\npm.globals.set('RANDOM_FIRST_NAME', randomFirstName);\r\nconst randomLastName = 'Last' + Math.floor(Math.random() * 100000);\r\npm.globals.set('RANDOM_LAST_NAME', randomLastName);\r\nconst randomBirthDate = getRandomDate('1980-01-01', '2000-12-31');\r\npm.globals.set('RANDOM_BIRTH_DATE', randomBirthDate);\r\nconst randomAddress = 'Address' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_ADDRESS', randomAddress);\r\nconst randomAddressLine2 = 'Address2' + Math.floor(Math.random() * 100);\r\npm.globals.set('RANDOM_ADDRESS_LINE2', randomAddressLine2);\r\nconst randomMunicipality = 'City' + Math.floor(Math.random() * 100);\r\npm.globals.set('RANDOM_MUNICIPALITY', randomMunicipality);\r\nconst randomPostalCode = '1' + Math.floor(Math.random() * 100000);\r\npm.globals.set('RANDOM_POSTAL_CODE', randomPostalCode);\r\nconst randomPhoneNumber = '+49 ' + getRandomPhoneNumber();\r\npm.globals.set('RANDOM_PHONE_NUMBER', randomPhoneNumber);\r\nconst randomInternationalPhoneCode = '49';\r\npm.globals.set('RANDOM_INTERNATIONAL_PHONE_CODE', randomInternationalPhoneCode);\r\nconst randomWorkEmail = 'work' + Math.floor(Math.random() * 100000) + '@example.com';\r\npm.globals.set('RANDOM_WORK_EMAIL', randomWorkEmail);\r\nconst randomHomeEmail = 'home' + Math.floor(Math.random() * 100000) + '@home.com';\r\npm.globals.set('RANDOM_HOME_EMAIL', randomHomeEmail);\r\nconst randomEmployeeStatus = 'Active';\r\npm.globals.set('RANDOM_EMPLOYEE_STATUS', randomEmployeeStatus);\r\nconst randomHireDate = getRandomDate('1980-01-01', '2000-12-31');\r\npm.globals.set('RANDOM_HIRE_DATE', randomHireDate);\r\nconst randomProbationEndDate = getRandomDate('1980-01-01', '2000-12-31');\r\npm.globals.set('RANDOM_PROBATION_END_DATE', randomProbationEndDate);\r\nconst randomBusinessTitle = 'Title' + Math.floor(Math.random() * 100);\r\npm.globals.set('RANDOM_BUSINESS_TITLE', randomBusinessTitle);\r\nconst randomScheduledWeeklyHours = '40';\r\npm.globals.set('RANDOM_SCHEDULED_WEEKLY_HOURS', randomScheduledWeeklyHours);\r\nconst randomOrganization = 'ORG-' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_ORGANIZATION', randomOrganization);\r\nconst randomOrganizationName = 'Organization' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_ORGANIZATION_NAME', randomOrganizationName);\r\nconst randomDepartmentName = 'Department' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_DEPARTMENT_NAME', randomDepartmentName);\r\nconst randomTeamName = 'Team' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_TEAM_NAME', randomTeamName);\r\nconst randomOrganizationType = 'Company';\r\npm.globals.set('RANDOM_ORGANIZATION_TYPE', randomOrganizationType);\r\nconst randomSupervisorID = '1000' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_SUPERVISOR_ID', randomSupervisorID);\r\nconst randomSupervisorName = 'Supervisor' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_SUPERVISOR_NAME', randomSupervisorName);\r\nconst randomPersonnelNumber = 90000 + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_PERSONNEL_NUMBER', randomPersonnelNumber);\r\nconst randomDriversLicenseClass = 'Class' + Math.floor(Math.random() * 1000);\r\npm.globals.set('RANDOM_DRIVERS_LICENSE_CLASS', randomDriversLicenseClass);\r\nconst randomDriversLicenseExpiration = getRandomDate('1980-01-01', '2000-12-31');\r\npm.globals.set('RANDOM_DRIVERS_LICENSE_EXPIRATION', randomDriversLicenseExpiration);\r\n\r\nfunction getRandomDate(start, end) {\r\n    const startDate = new Date(start).getTime();\r\n    const endDate = new Date(end).getTime();\r\n    const randomDate = new Date(Math.random() * (endDate - startDate) + startDate);\r\n    return randomDate.toISOString().split('T')[0];\r\n}\r\n\r\nfunction getRandomPhoneNumber() {\r\n    let randomRegion = generateRandomRegion();\r\n    let randomLine = getRandomInRange(100_0000, 999_9999);\r\n    return ` (${randomRegion}) ${randomLine}`;\r\n}\r\n\r\nfunction generateRandomRegion() {\r\n    const excludedValue = 49;\r\n    let randomNumber;\r\n\r\n    do {\r\n        randomNumber = getRandomInRange(10, 999);\r\n    } while (randomNumber === excludedValue);\r\n\r\n    return randomNumber;\r\n}\r\n\r\nfunction getRandomInRange(min, max) {\r\n    return Math.floor(Math.random() * (max - min + 1)) + min;\r\n}\r\n",
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n",
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "text/plain"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt_for_workday_to_airtable}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "text/plain"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?><Block>  <ws:Worker xmlns:ws=\"urn:com.workday/workersync\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><ws:Summary><ws:Employee_ID>{{RANDOM_ID}}</ws:Employee_ID><ws:Name>{{RANDOM_FIRST_NAME}} {{RANDOM_LAST_NAME}}</ws:Name>    </ws:Summary>    <ws:Eligibility>true</ws:Eligibility>    <ws:Personal>      <ws:Name_Data>        <ws:First_Name>{{RANDOM_FIRST_NAME}}</ws:First_Name>        <ws:Last_Name>{{RANDOM_LAST_NAME}}</ws:Last_Name>      </ws:Name_Data>      <ws:Birth_Date>{{RANDOM_BIRTH_DATE}}</ws:Birth_Date>      <ws:Address_Data>        <ws:Address_Type>HOME</ws:Address_Type>        <ws:Is_Primary>true</ws:Is_Primary>        <ws:Address_Line_Data ws:Label=\"Street\" ws:Type=\"ADDRESS_LINE_1\">{{RANDOM_ADDRESS}}</ws:Address_Line_Data>        <ws:Address_Line_Data ws:Label=\"Additional Address\" ws:Type=\"ADDRESS_LINE_2\">{{RANDOM_ADDRESS_LINE2}}</ws:Address_Line_Data>        <ws:Municipality>{{RANDOM_MUNICIPALITY}}</ws:Municipality>        <ws:Postal_Code>{{RANDOM_POSTAL_CODE}}</ws:Postal_Code>      </ws:Address_Data>      <ws:Phone_Data>        <ws:Phone_Type>HOME</ws:Phone_Type>        <ws:Phone_Device_Type>Mobile</ws:Phone_Device_Type>        <ws:Formatted_Phone_Number>{{RANDOM_PHONE_NUMBER}}</ws:Formatted_Phone_Number>        <ws:International_Phone_Code>49</ws:International_Phone_Code>      </ws:Phone_Data>      <ws:Email_Data>        <ws:Email_Type>WORK</ws:Email_Type>        <ws:Email_Address>{{RANDOM_WORK_EMAIL}}</ws:Email_Address>      </ws:Email_Data>      <ws:Email_Data>        <ws:Email_Type>HOME</ws:Email_Type>        <ws:Email_Address>{{RANDOM_HOME_EMAIL}}</ws:Email_Address>      </ws:Email_Data>    </ws:Personal>    <ws:Status>      <ws:Employee_Status>{{RANDOM_EMPLOYEE_STATUS}}</ws:Employee_Status>      <ws:Hire_Date>{{RANDOM_HIRE_DATE}}</ws:Hire_Date>      <ws:Probation_End_Date>{{RANDOM_PROBATION_END_DATE}}</ws:Probation_End_Date>    </ws:Status>    <ws:Position>      <ws:Business_Title>{{RANDOM_BUSINESS_TITLE}}</ws:Business_Title>      <ws:Scheduled_Weekly_Hours>{{RANDOM_SCHEDULED_WEEKLY_HOURS}}</ws:Scheduled_Weekly_Hours>      <ws:Organization_Data>        <ws:Organization>{{RANDOM_ORGANIZATION}}</ws:Organization>        <ws:Organization_Name>{{RANDOM_ORGANIZATION_NAME}}</ws:Organization_Name>        <ws:Organization_Type>Company</ws:Organization_Type>      </ws:Organization_Data>      <ws:Organization_Data>        <ws:Organization>CUSTOM_ORGANIZATION-6-5</ws:Organization>        <ws:Organization_Name>{{RANDOM_TEAM_NAME}}</ws:Organization_Name>        <ws:Organization_Type>ORGANIZATION_TYPE_TEAM</ws:Organization_Type>      </ws:Organization_Data>      <ws:Organization_Data>        <ws:Organization>CUSTOM_ORGANIZATION-6-3</ws:Organization>        <ws:Organization_Name>{{RANDOM_DEPARTMENT_NAME}}</ws:Organization_Name>        <ws:Organization_Type>ORGANIZATION_TYPE_DEPARTMENT</ws:Organization_Type>      </ws:Organization_Data>      <ws:Organization_Data>        <ws:Organization>1005091</ws:Organization>        <ws:Organization_Name>Corporate People</ws:Organization_Name>        <ws:Organization_Type>Cost_Center</ws:Organization_Type>      </ws:Organization_Data>      <ws:Business_Site>LOC_001</ws:Business_Site>      <ws:Business_Site_Name>DE Berlin</ws:Business_Site_Name>      <ws:Supervisor>        <ws:Supervisor_ID>{{RANDOM_SUPERVISOR_ID}}</ws:Supervisor_ID>        <ws:Supervisor_Name>{{RANDOM_SUPERVISOR_NAME}}</ws:Supervisor_Name>      </ws:Supervisor>    </ws:Position> <ws:Identification_Data><ws:Operation>NONE</ws:Operation><ws:Identification>Custom</ws:Identification><ws:ID>{{RANDOM_PERSONNEL_NUMBER}}</ws:ID><ws:ID_Type>Datev</ws:ID_Type></ws:Identification_Data><ws:Identification_Data><ws:Operation>ADD</ws:Operation><ws:Identification>License</ws:Identification><ws:ID_Type ws:PriorValue=\"\">Drivers_License</ws:ID_Type><ws:Expiration_Date ws:PriorValue=\"\">{{RANDOM_DRIVERS_LICENSE_EXPIRATION}}</ws:Expiration_Date><ws:License_Class ws:PriorValue=\"\">{{RANDOM_DRIVERS_LICENSE_CLASS}}</ws:License_Class></ws:Identification_Data> </ws:Worker></Block>"
+				},
+				"url": {
+					"raw": "http://{{ENPAL_TRANSCRIBER_SUBDOMAIN}}.azurewebsites.net/api/EmployeeEventReceiver",
+					"protocol": "http",
+					"host": [
+						"{{ENPAL_TRANSCRIBER_SUBDOMAIN}}",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"EmployeeEventReceiver"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://api.airtable.com/v0/{{AIRTABLE_BASE_ID}}/{{AIRTABLE_TABLE_ID}}?filterByFormula=%7BEnpal+ID%7D+%3D+%22{{RANDOM_ID}}%22",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": "const retries = 10;\r\nconst delayInMilliseconds = 1000;\r\n(async function main() {\r\n    let records = extractRecords(pm.response);\r\n    while (records?.length < 1 && retries > 0) {\r\n        records = await retryRequest(pm.request, retries);\r\n    }\r\n\r\n    pm.test('Response contains exactly 1 record', function () {\r\n        pm.expect(records.length).to.be.eq(1);\r\n    });\r\n\r\n    const responseRecord = records[0];\r\n    pm.test('Response body matches random values', function () {\r\n        pm.globals.set('RECORD_ID', responseRecord.id);\r\n        const responseFields = responseRecord.fields;\r\n        const expectedFirstName = `${pm.variables.get('RANDOM_FIRST_NAME')} ${pm.variables.get('RANDOM_LAST_NAME')}`;\r\n        pm.expect(responseFields.Name).to.eql(expectedFirstName);\r\n        const expectedAddress = pm.variables.get('RANDOM_ADDRESS');\r\n        pm.expect(responseFields['Straße']).to.eql(expectedAddress);\r\n        const expectedAddressLine2 = pm.variables.get('RANDOM_ADDRESS_LINE2');\r\n        pm.expect(responseFields['Hausnummer']).to.eql(expectedAddressLine2);\r\n        const expectedMunicipality = pm.variables.get('RANDOM_MUNICIPALITY');\r\n        pm.expect(responseFields.Stadt).to.eql(expectedMunicipality);\r\n        const expectedPostalCode = pm.variables.get('RANDOM_POSTAL_CODE');\r\n        pm.expect(responseFields['PLZ (5)']).to.eql(expectedPostalCode);\r\n        const expectedPhoneNumber = pm.variables.get('RANDOM_PHONE_NUMBER');\r\n        const normalizedExpectedPhoneNumber = expectedPhoneNumber.replace(/\\D/g, '');\r\n        const normalizedResponsePhoneNumber = responseFields.Mobil.replace(/\\D/g, '');\r\n        pm.expect(normalizedResponsePhoneNumber).to.eql(normalizedExpectedPhoneNumber);\r\n        const expectedHomeEmail = pm.variables.get('RANDOM_HOME_EMAIL');\r\n        pm.expect(responseFields['E-Mail']).to.eql(expectedHomeEmail);\r\n        const expectedWorkEmail = pm.variables.get('RANDOM_WORK_EMAIL');\r\n        pm.expect(responseFields['Enpal E-Mail']).to.eql(expectedWorkEmail);\r\n        const expectedEmployeeStatus = pm.variables.get('RANDOM_EMPLOYEE_STATUS');\r\n        pm.expect(responseFields.Status).to.eql(expectedEmployeeStatus);\r\n        const expectedHireDate = pm.variables.get('RANDOM_HIRE_DATE');\r\n        pm.expect(responseFields.Start).to.eql(expectedHireDate);\r\n        const expectedProbationEndDate = pm.variables.get('RANDOM_PROBATION_END_DATE');\r\n        pm.expect(responseFields['Probezeit Ende']).to.eql(expectedProbationEndDate);\r\n        const expectedBusinessTitle = pm.variables.get('RANDOM_BUSINESS_TITLE');\r\n        pm.expect(responseFields.Titel).to.eql(expectedBusinessTitle);\r\n        const expectedBirthDate = pm.variables.get('RANDOM_BIRTH_DATE');\r\n        pm.expect(responseFields.Geburtstag).to.eql(expectedBirthDate);\r\n        const expectedScheduledWeeklyHours = pm.variables.get('RANDOM_SCHEDULED_WEEKLY_HOURS');\r\n        pm.expect(responseFields.Stundenwoche).to.eql(expectedScheduledWeeklyHours);\r\n        const expectedOrganizationName = pm.variables.get('RANDOM_ORGANIZATION_NAME');\r\n        pm.expect(responseFields['Gesellschaft']).to.eql(expectedOrganizationName);\r\n        const expectedDepartmentName = pm.variables.get('RANDOM_DEPARTMENT_NAME');\r\n        pm.expect(responseFields.Abteilung).to.eql(expectedDepartmentName);\r\n        const expectedTeamName = pm.variables.get('RANDOM_TEAM_NAME');\r\n        pm.expect(responseFields.Team).to.eql(expectedTeamName);\r\n        const expectedSupervisorName = pm.variables.get('RANDOM_SUPERVISOR_NAME');\r\n        pm.expect(responseFields.Teamleiter).to.eql(expectedSupervisorName);\r\n        const expectedPersonnelNumber = pm.variables.get('RANDOM_PERSONNEL_NUMBER');\r\n        pm.expect(responseFields.Personalnummer).to.eql(expectedPersonnelNumber);\r\n        const expectedDriversLicenseClass = pm.variables.get('RANDOM_DRIVERS_LICENSE_CLASS');\r\n        pm.expect(responseFields['Driver\\'s License Class']).to.eql(expectedDriversLicenseClass);\r\n        const expectedDriversLicenseExpiration = pm.variables.get('RANDOM_DRIVERS_LICENSE_EXPIRATION');\r\n        pm.expect(responseFields['Driver\\'s Expiration Date']).to.eql(expectedDriversLicenseExpiration);\r\n    });\r\n})();\r\n\r\nfunction retryRequest(request, retries) {\r\n    return new Promise((resolve, reject) => {\r\n        return pm.sendRequest(request, async function (error, response) {\r\n            let records = extractRecords(response);\r\n            if (records?.length > 0) {\r\n                return resolve(records);\r\n            }\r\n            else if (retries > 0) {\r\n                await sleep();\r\n                return resolve(retryRequest(request));\r\n            }\r\n            else\r\n            {\r\n                return reject(error);\r\n            }\r\n        });\r\n    });\r\n}\r\n\r\nfunction extractRecords(response) {\r\n    const records = (response?.json()?.records);\r\n    return (records?.length > 0)\r\n        ? records\r\n        : [];\r\n}\r\n\r\nfunction sleep() {\r\n    return new Promise(resolve =>\r\n        setTimeout(resolve, delayInMilliseconds)\r\n    );\r\n}\r\n",
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AIRTABLE_PAT}}"
+					}
+				],
+				"url": {
+					"raw": "https://api.airtable.com/v0/{{AIRTABLE_BASE_ID}}/{{AIRTABLE_TABLE_ID}}?filterByFormula=%7BEnpal+ID%7D+%3D+%22{{RANDOM_ID}}%22",
+					"protocol": "https",
+					"host": [
+						"api",
+						"airtable",
+						"com"
+					],
+					"path": [
+						"v0",
+						"{{AIRTABLE_BASE_ID}}",
+						"{{AIRTABLE_TABLE_ID}}"
+					],
+					"query": [
+						{
+							"key": "filterByFormula",
+							"value": "%7BEnpal+ID%7D+%3D+%22{{RANDOM_ID}}%22"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cleanup - Delete Record",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AIRTABLE_PAT}}"
+					}
+				],
+				"url": {
+					"raw": "https://api.airtable.com/v0/{{AIRTABLE_BASE_ID}}/{{AIRTABLE_TABLE_ID}}/{{RECORD_ID}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"airtable",
+						"com"
+					],
+					"path": [
+						"v0",
+						"{{AIRTABLE_BASE_ID}}",
+						"{{AIRTABLE_TABLE_ID}}",
+						"{{RECORD_ID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
