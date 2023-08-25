@@ -12,7 +12,6 @@ export function run(args: { _: any[]; }) {
     const result = shell.exec(newmanCommand);
     cleanUp(outputFilePath, transformedFilePath);
     exit(result);
-    return transformedContent;
 }
 
 
