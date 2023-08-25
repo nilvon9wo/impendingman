@@ -1,7 +1,17 @@
 // noinspection ES6ConvertRequireIntoImport
 const minimist = require('minimist');
-import  {run} from './runner';
+import  {run} from './services/runner';
+import  {populate} from './services/populator';
 
 const args = minimist(process.argv.slice(2));
-run(args);
-
+switch (args._[0]) {
+    case 'run':
+        run(args);
+        break;
+    case 'populate':
+        populate(args);
+        break;
+    default:
+        console.error('Unsupported!');
+        process.exit(404);
+}
