@@ -3,15 +3,26 @@ import {transformCollection} from "./transformTemplate";
 const shell = require('shelljs');
 import {ShellString} from 'shelljs';
 
+const customOutputPrefix = 'impending-man';
 const customOutputFlag = 'impending-man-output';
 export function run(args: { _: any[]; }) {
-    const transformedContent = transformCollection(args);
-    const {outputFilePath, transformedFilePath} = writeTransformedCollection(transformedContent, args);
-    const newmanArgsAfterTemplate = extractNewmanArguments();
-    const newmanCommand = `newman run ${transformedFilePath} ${newmanArgsAfterTemplate}`;
-    const result = shell.exec(newmanCommand);
-    cleanUp(outputFilePath, transformedFilePath);
-    exit(result);
+    let transformedContent: string = '';
+    try {
+        transformedContent = transformCollection(args);
+    }
+    catch (error) {
+        console.error(error);
+        process.exit(404);
+    }
+
+    if (transformedContent) {
+        const {outputFilePath, transformedFilePath} = writeTransformedCollection(transformedContent, args);
+        const newmanArgsAfterTemplate = extractNewmanArguments();
+        const newmanCommand = `newman run ${transformedFilePath} ${newmanArgsAfterTemplate}`;
+        const result = shell.exec(newmanCommand);
+        cleanUp(outputFilePath, transformedFilePath);
+        exit(result);
+    }
 }
 
 
@@ -38,7 +49,7 @@ function createTimestampedPath() {
 
 function extractNewmanArguments() {
     return process.argv.slice(3)
-        .filter(arg => arg !== `--${customOutputFlag}`)
+        .filter(arg => !arg.startsWith(`--${customOutputPrefix}`))
         .join(' ');
 }
 
