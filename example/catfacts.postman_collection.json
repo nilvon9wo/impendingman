@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "6a667f11-3740-4581-8d0d-c412fb1faa4c",
+		"name": "Impendingman Example",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12364657"
+	},
+	"item": [
+		{
+			"name": "Cat Fact Ninja",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": "// Test for status code 200\r\npm.test('Status code is 200', function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\n// Test for a valid JSON response\r\npm.test('Response is valid JSON', function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\n// Test for the presence of the 'fact' property\r\npm.test('Response contains \\'fact\\' property', function () {\r\n    pm.expect(pm.response.json()).to.have.property('fact');\r\n});\r\n\r\n// Test for the presence of the 'length' property\r\npm.test('Response contains \\'length\\' property', function () {\r\n    pm.expect(pm.response.json()).to.have.property('length');\r\n});\r\n\r\n// Test the length property's value\r\npm.test('Length property matches fact length', function () {\r\n    const response = pm.response.json();\r\n    pm.expect(response.length).to.equal(response.fact.length);\r\n});\r\n",
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{TARGET_DOMAIN}}/fact",
+					"protocol": "https",
+					"host": [
+						"catfact",
+						"ninja"
+					],
+					"path": [
+						"fact"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

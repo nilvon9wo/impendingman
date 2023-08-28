@@ -21,7 +21,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://catfact.ninja/fact",
+					"raw": "https://{{TARGET_DOMAIN}}/fact",
 					"protocol": "https",
 					"host": [
 						"catfact",
