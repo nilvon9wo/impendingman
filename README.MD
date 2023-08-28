@@ -71,7 +71,51 @@ node impendingman.js populate "./path/to/collection.template.json" -g "./path/to
 
 During execution, the template is also printed to the console. To prevent this console output, use the `--impending-man-no-console` switch. However, this switch is not allowed without specifying `--impending-man-output`.
 
-## Notes
+### Impendingman Example
+
+This example demonstrates how to use Impendingman, a tool that enhances Postman collections with dynamic capabilities. In this example, we'll work with the Cat Fact Ninja API (https://catfact.ninja/fact) to showcase how Impendingman can be integrated into your testing workflow.
+
+#### Prerequisites
+
+1. Install [Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+3. Install [newman](https://learning.postman.com/docs/collections/using-newman-cli/installing-running-newman/).
+
+#### Getting Started
+
+1. Clone or download the Impendingman repository from GitHub (https://github.com/nilvon9wo/impendingman).
+2. Navigate to the `example` folder within the repository.
+
+#### Running the Example
+
+1. Open a terminal and navigate to the `example` directory.
+2. Run the `run.sh` script:
+
+   ```bash
+   ./run.sh
+   ```
+
+This script uses Impendingman to run a test against the Cat Fact Ninja API and generate a Postman collection with the test results.
+
+Observe the script's execution. You should see the tests pass, and a new file named `catfacts.postman_collection.json` will be created in the example directory.
+
+#### Details of the Example:
+- `run.sh`: A simple shell script that executes Impendingman with the appropriate arguments.
+- `example.postman_collection.template.json`: A Postman collection template that defines a request to the Cat Fact Ninja API. The collection includes a reference to a test script.
+- `scripts/catfact_ninja_tests.js`: A JavaScript file containing Postman test scripts that validate the API response. This file is referenced in the `example.postman_collection.template.json`.
+
+#### Important Note:
+- The `TARGET_DOMAIN` environment variable is set in the `run.sh` script. It is used to replace the placeholder in the request URL with the actual domain.
+
+#### Conclusion:
+This example demonstrates how to integrate Impendingman into your testing process, enabling dynamic and flexible testing scenarios. Customize the example to suit your own APIs and testing requirements.
+
+For more information about Impendingman, refer to the official repository: https://github.com/yourusername/impendingman
+
+Feel free to reach out for any questions or assistance!
+
+
+
+## Further Notes
 * Triple curly braces ({{{ }}}) are used to distinguish Impendingman's interpolation from Postman and Newman's double curly braces.
 * While `file:///` is required for the pattern matcher, other URIs are not currently supported.
 * This solution is specifically designed for replacing references to JavaScript files with executable JavaScript. While you can include file references anywhere, using them to replace other contents hasn't been tested and isn't guaranteed to work as expected.

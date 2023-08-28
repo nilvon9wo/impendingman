@@ -1,6 +1,5 @@
 /.idea/
 /node_modules/
-/run.sh
 /etc/
 /dist/
 /*.log
