@@ -58,7 +58,7 @@ The `--impending-man-output` option is optional. If omitted, a random name is us
 
 By default, the system will throw an error if files referenced in the collection JSON are missing. 
 To allow Newman execution to continue despite these missing files (which may still result in a subsequent failure), 
-use the flag --impending-man-on-missing-file=warning-only.
+use the flag `--impending-man-on-missing-file=warning-only`.
 
 ### Populate
 
