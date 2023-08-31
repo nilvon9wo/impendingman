@@ -64,15 +64,9 @@ function resolve(
 }
 
 function reevaluate(content: string, resolvedPath: string) {
-    if (content.includes('{{{'))
-    {
-        const nestedTemplateDir = path.dirname(resolvedPath);
-        return transformTemplate(content, nestedTemplateDir);
-    }
-    else
-    {
-        return content;
-    }
+    return (placeholderRegex.test(content))
+        ? transformTemplate(content, resolvedPath)
+        : content;
 }
 
 function handleMissingFile(scriptContent: any, filePath: string) {
