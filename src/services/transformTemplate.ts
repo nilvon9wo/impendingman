@@ -13,18 +13,17 @@ export function transformCollection(args: { _: any[]; }) {
     const resolvedTemplateFilePath = path.resolve(templateFilePath);
     const templateContent = shell.cat(resolvedTemplateFilePath)
         .toString();
-    return transformTemplate(templateContent, templateFilePath, args);
+    return transformTemplate(templateContent, templateFilePath);
 }
 
 function transformTemplate(
     templateContent: string,
-    templateFilePath: string,
-    args: { _: any[]; }
+    templateFilePath: string
 ): string {
     const templateDir = path.dirname(templateFilePath);
     let match;
     while ((match = placeholderRegex.exec(templateContent)) !== null) {
-        templateContent = fillPlaceholder(match, templateDir, templateContent, args);
+        templateContent = fillPlaceholder(match, templateDir, templateContent);
     }
 
     return templateContent;
@@ -33,22 +32,25 @@ function transformTemplate(
 function fillPlaceholder(
         match: RegExpExecArray,
         templateDir: string,
-        templateContent: string,
-        args: { _: any[] }
+        templateContent: string
     ) {
     const placeholder = match[0];
     const filePath = match[2];
     const absolutePath = path.join(templateDir, filePath)
         .replace(/\\/g, '/');
     const resolvedPath = path.resolve(absolutePath);
-    const scriptContent = shell.cat(resolvedPath)
+    const content = shell.cat(resolvedPath)
         .toString();
-    handleMissingFile(scriptContent, filePath, args);
-    const resolvedContent = resolve(match, scriptContent);
+    handleMissingFile(content, filePath);
+    const resolvedContent = resolve(match, content, resolvedPath);
     return templateContent.replace(placeholder, ` ${JSON.stringify(resolvedContent)}`);
 }
 
-function resolve(match: RegExpExecArray, scriptContent: string) {
+function resolve(
+        match: RegExpExecArray,
+        content: string,
+        resolvedPath: string,
+) {
     const hasOpeningQuote = match[1] !== undefined;
     const hasClosingQuote = match[3] !== undefined;
     const isQuoted = hasOpeningQuote && hasClosingQuote;
@@ -57,22 +59,27 @@ function resolve(match: RegExpExecArray, scriptContent: string) {
     }
 
     return isQuoted
-        ? JSON.stringify(scriptContent)
-        : scriptContent;
+        ? JSON.stringify(content)
+        : reevaluate(content, resolvedPath);
 }
 
-function handleMissingFile(scriptContent: any, filePath: string, args: { _: any[]; }) {
-    if (scriptContent) {
-        return scriptContent;
+function reevaluate(content: string, resolvedPath: string) {
+    if (content.includes('{{{'))
+    {
+        const nestedTemplateDir = path.dirname(resolvedPath);
+        return transformTemplate(content, nestedTemplateDir);
     }
+    else
+    {
+        return content;
+    }
+}
 
-    const flag: string = String(args[customMissingFileFlag as keyof typeof args]);
-    switch (flag) {
-        case 'warning-only':
-            console.warn(`Failed to read file: ${filePath}`);
-            break;
-        default:
-            throw new Error(`Failed to read file: ${filePath}`);
+function handleMissingFile(scriptContent: any, filePath: string) {
+    if (!scriptContent) {
+        throw new Error(`Failed to read file: ${filePath}`);
+    } else {
+        return scriptContent;
     }
 }
 
