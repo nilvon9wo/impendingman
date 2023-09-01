@@ -39,11 +39,7 @@ function fillPlaceholder(
         .toString();
     handleMissingFile(content, filePath!);
     const resolvedContent = resolve(match, content, resolvedPath);
-    console.log("##################### placeholder", placeholder);
-    console.log("##################### resolvedContent", resolvedContent);
-    let returnedContent = templateContent.replace(placeholder, resolvedContent);
-    console.log("##################### returnedContent", returnedContent);
-    return returnedContent;
+    return templateContent.replace(placeholder, resolvedContent);
 }
 
 function resolve(

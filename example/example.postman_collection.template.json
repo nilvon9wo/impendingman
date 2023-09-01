@@ -6,33 +6,6 @@
 		"_exporter_id": "12364657"
 	},
 	"item": [
-		{
-			"name": "Cat Fact Ninja",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": "{{{file:///./scripts/catfact_ninja_tests.js}}}",
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{TARGET_DOMAIN}}/fact",
-					"protocol": "https",
-					"host": [
-						"catfact",
-						"ninja"
-					],
-					"path": [
-						"fact"
-					]
-				}
-			},
-			"response": []
-		}
+		{{{file:///./steps/cat_fact_endpoint_step.template.json}}}
 	]
 }
