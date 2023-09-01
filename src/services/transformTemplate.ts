@@ -26,10 +26,10 @@ function transformTemplate(
 }
 
 function fillPlaceholder(
-        match: RegExpExecArray,
-        templateDir: string,
-        templateContent: string
-    ) {
+    match: RegExpExecArray,
+    templateDir: string,
+    templateContent: string
+) {
     const placeholder = match[0];
     const filePath = match.groups?.filePath;
     const absolutePath = path.join(templateDir, filePath!)
@@ -38,20 +38,43 @@ function fillPlaceholder(
     const content = shell.cat(resolvedPath)
         .toString();
     handleMissingFile(content, filePath!);
-    const resolvedContent = resolve(match, content, resolvedPath);
+    const resolvedContent = resolve(match, content, resolvedPath, templateDir);
     return templateContent.replace(placeholder, resolvedContent);
 }
 
 function resolve(
-        match: RegExpExecArray,
-        content: string,
-        resolvedPath: string,
+    match: RegExpExecArray,
+    content: string,
+    resolvedPath: string,
+    baseDir: string
 ) {
     const isQuoted = checkQuoted(match);
     return isQuoted
         ? ` ${JSON.stringify(content)} `
-        : content;
+        : reevaluate(content, resolvedPath, baseDir);
 }
+
+function reevaluate(content: string, resolvedPath: string, baseDir: string) {
+    const newDir = path.dirname(path.join(baseDir, resolvedPath));
+    let updatedContent = content;
+
+    updatedContent = updatedContent.replace(
+        placeholderRegex,
+        (match, openingQuote, filePath, closingQuote) => {
+            const absolutePath = path.join(newDir, filePath).replace(/\\/g, '/');
+            const resolvedPath = path.resolve(absolutePath);
+            const fileContent = shell.cat(resolvedPath).toString();
+            handleMissingFile(fileContent, filePath);
+            const isQuoted = openingQuote !== undefined && closingQuote !== undefined;
+
+            return isQuoted ?
+                JSON.stringify(fileContent)
+                : fileContent;
+        });
+
+    return updatedContent;
+}
+
 
 function checkQuoted(match: RegExpExecArray) {
     const hasOpeningQuote = match.groups?.openingQuote;
@@ -70,4 +93,3 @@ function handleMissingFile(scriptContent: any, filePath: string) {
         return scriptContent;
     }
 }
-
