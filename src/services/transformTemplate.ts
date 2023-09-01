@@ -13,58 +13,54 @@ export function transformCollection(args: { _: any[]; }) {
 }
 
 function transformTemplate(
-    templateContent: string,
-    templateFilePath: string
+    content: string,
+    filePath: string
 ): string {
-    const templateDir = path.dirname(templateFilePath);
+    const directory = path.dirname(filePath);
 
-    templateContent = templateContent.replace(
+    content = content.replace(
         placeholderRegex,
-        (match, openingQuote, filePath, closingQuote) => {
-            const absolutePath = path.join(templateDir, filePath)
-                .replace(/\\/g, '/');
-            const resolvedPath = path.resolve(absolutePath);
-            const fileContent = shell.cat(resolvedPath)
-                .toString();
-            handleMissingFile(fileContent, filePath);
-
-            const isQuoted = openingQuote !== undefined && closingQuote !== undefined;
-            return isQuoted ?
-                JSON.stringify(fileContent)
-                : reevaluate(fileContent, resolvedPath, templateDir);
-        });
-
-    return templateContent;
-}
-
-function reevaluate(content: string, resolvedPath: string, baseDir: string) {
-    const newDir = path.dirname(path.join(baseDir, resolvedPath));
-    let updatedContent = content;
-
-    updatedContent = updatedContent.replace(
-        placeholderRegex,
-        (match, openingQuote, filePath, closingQuote) => {
-            const absolutePath = path.join(newDir, filePath).replace(/\\/g, '/');
+        (match, hasOpeningQuote, filePath, hasClosingQuote) => {
+            const absolutePath = path.join(directory, filePath).replace(/\\/g, '/');
             const resolvedPath = path.resolve(absolutePath);
             const fileContent = shell.cat(resolvedPath).toString();
             handleMissingFile(fileContent, filePath);
 
-            const isQuoted = openingQuote !== undefined && closingQuote !== undefined;
-            return isQuoted ?
-                JSON.stringify(fileContent)
+            return checkQuoted(match, hasOpeningQuote, hasClosingQuote)
+                ? JSON.stringify(fileContent)
+                : reevaluate(fileContent, resolvedPath, directory);
+        });
+
+    return content;
+}
+
+function reevaluate(
+        content: string,
+        filePath: string,
+        baseDir: string
+    ) {
+    const directory = path.dirname(path.join(baseDir, filePath));
+
+    content = content.replace(
+        placeholderRegex,
+        (match, hasOpeningQuote, filePath, hasClosingQuote) => {
+            const absolutePath = path.join(directory, filePath).replace(/\\/g, '/');
+            const resolvedPath = path.resolve(absolutePath);
+            const fileContent = shell.cat(resolvedPath).toString();
+            handleMissingFile(fileContent, filePath);
+
+            return checkQuoted(match, hasOpeningQuote, hasClosingQuote)
+                ? JSON.stringify(fileContent)
                 : fileContent;
         });
 
-    return updatedContent;
+    return content;
 }
 
-
-function checkQuoted(match: RegExpExecArray) {
-    const hasOpeningQuote = match.groups?.openingQuote;
-    const hasClosingQuote = match.groups?.closingQuote;
+function checkQuoted(match: string, hasOpeningQuote: boolean, hasClosingQuote: boolean) {
     const isQuoted = hasOpeningQuote && hasClosingQuote;
     if (!isQuoted && (hasOpeningQuote || hasClosingQuote)) {
-        throw new Error(`Imbalanced quotes around placeholder ${match[0]}`);
+        throw new Error(`Imbalanced quotes around placeholder ${match}`);
     }
     return isQuoted;
 }
