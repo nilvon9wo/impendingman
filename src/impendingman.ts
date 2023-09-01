@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // noinspection ES6ConvertRequireIntoImport
 const minimist = require('minimist');
 import  {run} from './services/runner';
