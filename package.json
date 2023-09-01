@@ -1,6 +1,6 @@
 {
   "name": "impendingman",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Impendingman is a wrapper for Newman�s Postman collection runner.",
   "main": "dist/impendingman.js",
   "types": "dist/impendingman.d.ts",
@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "Brian Kessler",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "@types/minimist": "^1.2.2",
     "@types/shelljs": "^0.8.12",
     "minimist": "^1.2.8",
