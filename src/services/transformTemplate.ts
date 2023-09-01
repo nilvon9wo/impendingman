@@ -17,30 +17,35 @@ function transformTemplate(
     filePath: string
 ): string {
     const directory = path.dirname(filePath);
-
-    content = content.replace(
-        placeholderRegex,
-        (match, hasOpeningQuote, filePath, hasClosingQuote) => {
-            const absolutePath = path.join(directory, filePath).replace(/\\/g, '/');
-            const resolvedPath = path.resolve(absolutePath);
-            const fileContent = shell.cat(resolvedPath).toString();
-            handleMissingFile(fileContent, filePath);
-
-            return checkQuoted(match, hasOpeningQuote, hasClosingQuote)
-                ? JSON.stringify(fileContent)
-                : reevaluate(fileContent, resolvedPath, directory);
-        });
-
-    return content;
+    return makeReplacements(
+        content,
+        filePath,
+        directory,
+        (fileContent: string, resolvedPath: string, directory: string) =>
+            reevaluate(fileContent, resolvedPath, directory)
+    );
+}
+function reevaluate(
+    content: string,
+    filePath: string,
+    baseDir: string
+) {
+    const directory = path.dirname(path.join(baseDir, filePath));
+    return makeReplacements(
+        content,
+        filePath,
+        directory,
+        (fileContent: string, resolvedPath: string, directory: string) =>
+            fileContent
+    );
 }
 
-function reevaluate(
-        content: string,
-        filePath: string,
-        baseDir: string
-    ) {
-    const directory = path.dirname(path.join(baseDir, filePath));
-
+function makeReplacements(
+    content: string,
+    filePath: string,
+    directory: string,
+    doWithEmbeddedObject: (fileContent: string, resolvedPath: string, directory: string) => string
+): string {
     content = content.replace(
         placeholderRegex,
         (match, hasOpeningQuote, filePath, hasClosingQuote) => {
@@ -51,7 +56,7 @@ function reevaluate(
 
             return checkQuoted(match, hasOpeningQuote, hasClosingQuote)
                 ? JSON.stringify(fileContent)
-                : fileContent;
+                : doWithEmbeddedObject(fileContent, resolvedPath, directory);
         });
 
     return content;
