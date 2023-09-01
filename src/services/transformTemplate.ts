@@ -17,41 +17,24 @@ function transformTemplate(
     templateFilePath: string
 ): string {
     const templateDir = path.dirname(templateFilePath);
-    let match;
-    while ((match = placeholderRegex.exec(templateContent)) !== null) {
-        templateContent = fillPlaceholder(match, templateDir, templateContent);
-    }
+
+    templateContent = templateContent.replace(
+        placeholderRegex,
+        (match, openingQuote, filePath, closingQuote) => {
+            const absolutePath = path.join(templateDir, filePath)
+                .replace(/\\/g, '/');
+            const resolvedPath = path.resolve(absolutePath);
+            const fileContent = shell.cat(resolvedPath)
+                .toString();
+            handleMissingFile(fileContent, filePath);
+
+            const isQuoted = openingQuote !== undefined && closingQuote !== undefined;
+            return isQuoted ?
+                JSON.stringify(fileContent)
+                : reevaluate(fileContent, resolvedPath, templateDir);
+        });
 
     return templateContent;
-}
-
-function fillPlaceholder(
-    match: RegExpExecArray,
-    templateDir: string,
-    templateContent: string
-) {
-    const placeholder = match[0];
-    const filePath = match.groups?.filePath;
-    const absolutePath = path.join(templateDir, filePath!)
-        .replace(/\\/g, '/');
-    const resolvedPath = path.resolve(absolutePath);
-    const content = shell.cat(resolvedPath)
-        .toString();
-    handleMissingFile(content, filePath!);
-    const resolvedContent = resolve(match, content, resolvedPath, templateDir);
-    return templateContent.replace(placeholder, resolvedContent);
-}
-
-function resolve(
-    match: RegExpExecArray,
-    content: string,
-    resolvedPath: string,
-    baseDir: string
-) {
-    const isQuoted = checkQuoted(match);
-    return isQuoted
-        ? ` ${JSON.stringify(content)} `
-        : reevaluate(content, resolvedPath, baseDir);
 }
 
 function reevaluate(content: string, resolvedPath: string, baseDir: string) {
@@ -65,8 +48,8 @@ function reevaluate(content: string, resolvedPath: string, baseDir: string) {
             const resolvedPath = path.resolve(absolutePath);
             const fileContent = shell.cat(resolvedPath).toString();
             handleMissingFile(fileContent, filePath);
-            const isQuoted = openingQuote !== undefined && closingQuote !== undefined;
 
+            const isQuoted = openingQuote !== undefined && closingQuote !== undefined;
             return isQuoted ?
                 JSON.stringify(fileContent)
                 : fileContent;
