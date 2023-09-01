@@ -19,7 +19,6 @@ function transformTemplate(
     const directory = path.dirname(filePath);
     return makeReplacements(
         content,
-        filePath,
         directory,
         (fileContent: string, resolvedPath: string, directory: string) =>
             reevaluate(fileContent, resolvedPath, directory)
@@ -33,7 +32,6 @@ function reevaluate(
     const directory = path.dirname(path.join(baseDir, filePath));
     return makeReplacements(
         content,
-        filePath,
         directory,
         (fileContent: string, resolvedPath: string, directory: string) =>
             containsPlaceholder(fileContent)
@@ -48,7 +46,6 @@ function containsPlaceholder(content: string): boolean {
 
 function makeReplacements(
     content: string,
-    filePath: string,
     directory: string,
     doWithEmbeddedObject: (fileContent: string, resolvedPath: string, directory: string) => string
 ): string {
@@ -60,7 +57,7 @@ function makeReplacements(
             const fileContent = shell.cat(resolvedPath).toString();
             handleMissingFile(fileContent, filePath);
 
-            return checkQuoted(match, hasOpeningQuote, hasClosingQuote)
+            return checkQuoted(hasOpeningQuote, hasClosingQuote, match)
                 ? JSON.stringify(fileContent)
                 : doWithEmbeddedObject(fileContent, resolvedPath, directory);
         });
@@ -68,7 +65,7 @@ function makeReplacements(
     return content;
 }
 
-function checkQuoted(match: string, hasOpeningQuote: boolean, hasClosingQuote: boolean) {
+function checkQuoted(hasOpeningQuote: boolean, hasClosingQuote: boolean, match: string) {
     const isQuoted = hasOpeningQuote && hasClosingQuote;
     if (!isQuoted && (hasOpeningQuote || hasClosingQuote)) {
         throw new Error(`Imbalanced quotes around placeholder ${match}`);
