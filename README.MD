@@ -1,6 +1,6 @@
 # Impendingman
 
-Impendingman is a wrapper for Newman’s Postman collection runner.
+Impendingman is a wrapper for Newmanï¿½s Postman collection runner.
 
 ## The Problem
 
@@ -109,7 +109,7 @@ Observe the script's execution. You should see the tests pass, and a new file na
 #### Conclusion:
 This example demonstrates how to integrate Impendingman into your testing process, enabling dynamic and flexible testing scenarios. Customize the example to suit your own APIs and testing requirements.
 
-For more information about Impendingman, refer to the official repository: https://github.com/yourusername/impendingman
+For more information about Impendingman, refer to the official repository: https://github.com/nilvon9wo/impendingman
 
 Feel free to reach out for any questions or assistance!
 
