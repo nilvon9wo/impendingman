@@ -9,60 +9,44 @@ export function transformCollection(args: { _: any[]; }) {
     const resolvedTemplateFilePath = path.resolve(templateFilePath);
     const templateContent = shell.cat(resolvedTemplateFilePath)
         .toString();
-    return transformTemplate(templateContent, templateFilePath);
+    const directory = path.dirname(templateFilePath);
+    return makeReplacements(templateContent, directory);
 }
 
-function transformTemplate(
-    content: string,
-    filePath: string
-): string {
-    const directory = path.dirname(filePath);
-    return makeReplacements(
-        content,
-        directory,
-        (fileContent: string, resolvedPath: string, directory: string) =>
-            reevaluate(fileContent, resolvedPath, directory)
-    );
-}
-function reevaluate(
-    content: string,
-    filePath: string,
-    baseDir: string
-) : string {
-    const directory = path.dirname(path.join(baseDir, filePath));
-    return makeReplacements(
-        content,
-        directory,
-        (fileContent: string, resolvedPath: string, directory: string) =>
-            containsPlaceholder(fileContent)
-                ? reevaluate(fileContent, resolvedPath, directory)
-                : fileContent
-    );
-}
-
-function containsPlaceholder(content: string): boolean {
-    return placeholderRegex.test(content);
-}
-
-function makeReplacements(
-    content: string,
-    directory: string,
-    doWithEmbeddedObject: (fileContent: string, resolvedPath: string, directory: string) => string
-): string {
-    content = content.replace(
+function makeReplacements(content: string, directory: string): string {
+    return content.replace(
         placeholderRegex,
         (match, hasOpeningQuote, filePath, hasClosingQuote) => {
-            const absolutePath = path.join(directory, filePath).replace(/\\/g, '/');
-            const resolvedPath = path.resolve(absolutePath);
-            const fileContent = shell.cat(resolvedPath).toString();
-            handleMissingFile(fileContent, filePath);
-
+            const resolvedPath = getFilePath(directory, filePath);
+            const newDirectory = path.dirname(path.join(directory, filePath));
+            const fileContent = getFileContent(resolvedPath, filePath);
             return checkQuoted(hasOpeningQuote, hasClosingQuote, match)
                 ? JSON.stringify(fileContent)
-                : doWithEmbeddedObject(fileContent, resolvedPath, directory);
+                : containsPlaceholder(fileContent)
+                    ? makeReplacements(fileContent, newDirectory)
+                    : fileContent;
         });
+}
 
-    return content;
+function getFilePath(directory: string, filePath: string) {
+    const absolutePath = path.join(directory, filePath)
+        .replace(/\\/g, '/');
+    return path.resolve(absolutePath);
+}
+
+function getFileContent(resolvedPath: string, filePath: string) {
+    const fileContent = shell.cat(resolvedPath)
+        .toString();
+    handleMissingFile(fileContent, filePath);
+    return fileContent;
+}
+
+function handleMissingFile(scriptContent: any, filePath: string) {
+    if (!scriptContent) {
+        throw new Error(`Failed to read file: ${filePath}`);
+    } else {
+        return scriptContent;
+    }
 }
 
 function checkQuoted(hasOpeningQuote: boolean, hasClosingQuote: boolean, match: string) {
@@ -73,10 +57,8 @@ function checkQuoted(hasOpeningQuote: boolean, hasClosingQuote: boolean, match: 
     return isQuoted;
 }
 
-function handleMissingFile(scriptContent: any, filePath: string) {
-    if (!scriptContent) {
-        throw new Error(`Failed to read file: ${filePath}`);
-    } else {
-        return scriptContent;
-    }
+function containsPlaceholder(content: string): boolean {
+    return placeholderRegex.test(content);
 }
+
+
