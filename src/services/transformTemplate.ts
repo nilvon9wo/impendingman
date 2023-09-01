@@ -29,15 +29,21 @@ function reevaluate(
     content: string,
     filePath: string,
     baseDir: string
-) {
+) : string {
     const directory = path.dirname(path.join(baseDir, filePath));
     return makeReplacements(
         content,
         filePath,
         directory,
         (fileContent: string, resolvedPath: string, directory: string) =>
-            fileContent
+            containsPlaceholder(fileContent)
+                ? reevaluate(fileContent, resolvedPath, directory)
+                : fileContent
     );
+}
+
+function containsPlaceholder(content: string): boolean {
+    return placeholderRegex.test(content);
 }
 
 function makeReplacements(
