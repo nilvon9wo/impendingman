@@ -14,5 +14,8 @@
     "minimist": "^1.2.8",
     "shelljs": "^0.8.5",
     "typescript": "^5.1.6"
+  },
+  "bin": {
+    "impendingman": "./dist/impendingman.js"
   }
 }
