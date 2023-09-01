@@ -1,12 +1,8 @@
 // noinspection ES6ConvertRequireIntoImport
-
 const path = require('path');
 const shell = require('shelljs');
 
-//const placeholderRegex = /\s*"{{{\s*file:\/\/\/\s*([^}]+)\s*}}}"\s*/g;
-const placeholderRegex = /\s*(")?\s*{{{\s*file:\/\/\/\s*([^}"']+)\s*}}}\s*(")?\s*/g;
-
-const customMissingFileFlag = 'impending-man-on-missing-file';
+const placeholderRegex = /\s*(?<openingQuote>")?\s*{{{\s*file:\/\/\/\s*(?<filePath>[^}"']+)\s*}}}\s*(?<closingQuote>")?\s*/g;
 
 export function transformCollection(args: { _: any[]; }) {
     const templateFilePath = args?._[1];
@@ -35,15 +31,19 @@ function fillPlaceholder(
         templateContent: string
     ) {
     const placeholder = match[0];
-    const filePath = match[2];
-    const absolutePath = path.join(templateDir, filePath)
+    const filePath = match.groups?.filePath;
+    const absolutePath = path.join(templateDir, filePath!)
         .replace(/\\/g, '/');
     const resolvedPath = path.resolve(absolutePath);
     const content = shell.cat(resolvedPath)
         .toString();
-    handleMissingFile(content, filePath);
+    handleMissingFile(content, filePath!);
     const resolvedContent = resolve(match, content, resolvedPath);
-    return templateContent.replace(placeholder, ` ${JSON.stringify(resolvedContent)}`);
+    console.log("##################### placeholder", placeholder);
+    console.log("##################### resolvedContent", resolvedContent);
+    let returnedContent = templateContent.replace(placeholder, resolvedContent);
+    console.log("##################### returnedContent", returnedContent);
+    return returnedContent;
 }
 
 function resolve(
@@ -51,22 +51,20 @@ function resolve(
         content: string,
         resolvedPath: string,
 ) {
-    const hasOpeningQuote = match[1] !== undefined;
-    const hasClosingQuote = match[3] !== undefined;
+    const isQuoted = checkQuoted(match);
+    return isQuoted
+        ? ` ${JSON.stringify(content)} `
+        : content;
+}
+
+function checkQuoted(match: RegExpExecArray) {
+    const hasOpeningQuote = match.groups?.openingQuote;
+    const hasClosingQuote = match.groups?.closingQuote;
     const isQuoted = hasOpeningQuote && hasClosingQuote;
     if (!isQuoted && (hasOpeningQuote || hasClosingQuote)) {
         throw new Error(`Imbalanced quotes around placeholder ${match[0]}`);
     }
-
-    return isQuoted
-        ? JSON.stringify(content)
-        : reevaluate(content, resolvedPath);
-}
-
-function reevaluate(content: string, resolvedPath: string) {
-    return (placeholderRegex.test(content))
-        ? transformTemplate(content, resolvedPath)
-        : content;
+    return isQuoted;
 }
 
 function handleMissingFile(scriptContent: any, filePath: string) {
