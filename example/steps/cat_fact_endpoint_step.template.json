@@ -1,13 +1,7 @@
 {
   "name": "Cat Fact Ninja",
   "event": [
-    {
-      "listen": "test",
-      "script": {
-        "exec": "{{{file:///./scripts/catfact_ninja_tests.js}}}",
-        "type": "text/javascript"
-      }
-    }
+    {{{file:///./events/catfact_ninja_test_event.template.json}}}
   ],
   "request": {
     "method": "GET",

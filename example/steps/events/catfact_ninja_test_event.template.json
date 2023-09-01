@@ -1,0 +1,7 @@
+{
+  "listen": "test",
+  "script": {
+    "exec": "{{{file:///./scripts/catfact_ninja_tests.js}}}",
+    "type": "text/javascript"
+  }
+}
