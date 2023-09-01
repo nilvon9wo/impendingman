@@ -3,4 +3,4 @@
 /etc/
 /dist/
 /*.log
-/impendingman-1.0.2.tgz
+/impendingman-*.tgz
