@@ -1,6 +1,6 @@
 {
   "name": "impendingman",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Impendingman is a wrapper for Newman�s Postman collection runner.",
   "main": "dist/impendingman.js",
   "types": "dist/impendingman.d.ts",
