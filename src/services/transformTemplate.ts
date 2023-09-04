@@ -21,7 +21,7 @@ function makeReplacements(content: string, directory: string): string {
             const newDirectory = path.dirname(path.join(directory, filePath));
             const fileContent = getFileContent(resolvedPath, filePath);
             return checkQuoted(hasOpeningQuote, hasClosingQuote, match)
-                ? JSON.stringify(fileContent)
+                ? JSON.stringify(preserveNonASCIICharacters(fileContent))
                 : containsPlaceholder(fileContent)
                     ? makeReplacements(fileContent, newDirectory)
                     : fileContent;
@@ -61,4 +61,8 @@ function containsPlaceholder(content: string): boolean {
     return placeholderRegex.test(content);
 }
 
-
+function preserveNonASCIICharacters(input: string): string {
+    return input.replace(/[\u0080-\uffff]/g, (char) =>
+        `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`
+    );
+}
